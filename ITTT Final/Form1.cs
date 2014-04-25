@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Security.Permissions;
+using System.Threading;
 
 
 namespace ITTT_Final
@@ -16,17 +17,20 @@ namespace ITTT_Final
         private Serialization s;
         private List<Task> list;
         private int taskNumber;
+        private DateTime time;
         public Form1()
         {         
             InitializeComponent();
             s = new Serialization(this);
             list = new List<Task>();
             taskNumber = 0;
+            UpdateInfoBox("Start programu");
             Logs.Info("Start programu");
         }
-        public void UpdateInfoLabel(string nfo)
+        public void UpdateInfoBox(string nfo)
         {
-            label14.Text = nfo;
+            time = DateTime.Now;
+            listBox2.Items.Add('[' + time.ToLongTimeString() + ' ' + time.ToShortDateString() + "] " + nfo);
         }
         public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
@@ -75,13 +79,15 @@ namespace ITTT_Final
                 tmp = list[i];
                 if (tmp.condition.CheckCondition(fileName, ref msg, this))
                 {
+                    UpdateInfoBox("Warunek został spełniony");
+                    Logs.Info("Warunek został spełniony");
                     tmp.action.ExecuteAction(fileName, msg);
-                    UpdateInfoLabel("Wykonano akcje");
+                    UpdateInfoBox("Wykonano akcje");
                     Logs.Info("Wykonano akcje");
                 }
                 else
                 {
-                    UpdateInfoLabel("Warunek nie został spełniony");
+                    UpdateInfoBox("Warunek nie został spełniony");
                     Logs.Info("Warunek nie został spełniony");
                 }
             }
@@ -91,6 +97,8 @@ namespace ITTT_Final
             listBox1.Items.Clear();
             list.Clear();
             taskNumber = 0;
+            UpdateInfoBox("Wyczyszczono listę zadań");
+            Logs.Info("Wyczyszczono listę zadań");
         }
         private void button4_Click(object sender, EventArgs e)
         {
@@ -104,9 +112,9 @@ namespace ITTT_Final
             for (int i = 0; i < taskNumber; i++)
                 listBox1.Items.Add(list[i].ToString());
          }
-
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
+            UpdateInfoBox("Zakończenie programu");
             Logs.Info("Zakończenie programu");
         }
     }

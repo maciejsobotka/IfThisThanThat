@@ -42,19 +42,19 @@ namespace ITTT_Final
                             {
                                 client.DownloadFile(src, fileName); // zapis obrazka do pliku
                                 msg = "Obrazek na temat: " + Text + ".\nPobrano ze strony: " + Url + '.';
-                                form.UpdateInfoLabel("Pobrano obrazek");
+                                form.UpdateInfoBox("Pobrano obrazek");
                                 Logs.Info("Pobrano obrazek");
                                 return true;
                             }
                         }
                     }
                 }
-                form.UpdateInfoLabel("Nie znaleziono obrazka z podanym tekstem");
+                form.UpdateInfoBox("Nie znaleziono obrazka z podanym tekstem");
                 Logs.Error("Nie znaleziono obrazka z podanym tekstem");
             }
             else
             {
-                form.UpdateInfoLabel("Podany Url nie istnieje");
+                form.UpdateInfoBox("Podany Url nie istnieje");
                 Logs.Error("Podany Url nie istnieje");
             }
             return false;                       // jak nie znaleziono obrazka
@@ -76,7 +76,7 @@ namespace ITTT_Final
                 {
                     string json = wc.DownloadString("http://api.openweathermap.org/data/2.5/weather?q=" + Url + ",pl");
                     weather = JsonConvert.DeserializeObject<WeatherObject>(json);
-                    form.UpdateInfoLabel("Pobrano dane pogodowe");
+                    form.UpdateInfoBox("Pobrano dane pogodowe");
                     Logs.Info("Pobrano dane pogodowe");
                     using (WebClient wc2 = new WebClient())
                     {
@@ -85,7 +85,7 @@ namespace ITTT_Final
                 }
                 catch
                 {
-                    form.UpdateInfoLabel("Serwer pogodowy nie odpowiada. Spróbuj ponownie");
+                    form.UpdateInfoBox("Serwer pogodowy nie odpowiada. Spróbuj ponownie");
                     Logs.Error("Serwer pogodowy nie odpowiada. Spróbuj ponownie");
                     return false;
                 }

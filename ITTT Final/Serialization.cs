@@ -22,6 +22,7 @@ namespace ITTT_Final
             file = File.Create("Data.dat");
             ser.Serialize(file, list);
             file.Close();
+            myForm.UpdateInfoBox("Serializacja powiodłą się");
             Logs.Info("Serializacja powiodłą się");
         }
         public List<Task> DeSerialize()
@@ -34,12 +35,13 @@ namespace ITTT_Final
                 FileStream file = File.OpenRead("Data.dat");
                 list = (List<Task>)ser.Deserialize(file);
                 file.Close();
+                myForm.UpdateInfoBox("DeSerializacja powiodłą się");
                 Logs.Info("DeSerializacja powiodłą się");
 
             }catch(FileNotFoundException)
             {
+                myForm.UpdateInfoBox("Nie znaleziono pliku z serializowanymi danymi");
                 Logs.Error("Nie znaleziono pliku z serializowanymi danymi");
-                myForm.UpdateInfoLabel("Nie znaleziono pliku z serializowanymi danymi");
             }
             return list;
         }
