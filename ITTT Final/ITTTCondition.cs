@@ -17,30 +17,45 @@ namespace ITTT_Final
         public string Url { get; set; }
         public string Text { get; set; }
 
-        public abstract bool CheckCondition(string a, string b);
+        public abstract bool CheckCondition(string a, ref string msg, Form1 form);
     }
     [Serializable]
     public class ITTTConditionPicture: ITTTCondition
     {
-        public override bool CheckCondition(string html, string fileName)
+        public override bool CheckCondition(string fileName, ref string msg, Form1 form)
         {
+            NetFunctions net = new NetFunctions();
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
-            doc.LoadHtml(html);
-            foreach (HtmlNode link in doc.DocumentNode.SelectNodes((".//img/@alt")))
+            if (net.IsUrl(Url))
             {
-                string alt = link.Attributes["alt"].Value;
-                if (alt.Contains(Text))                  // jak alt zawiera tekst
+                string html = net.GetPageHtml(Url);
+                doc.LoadHtml(html);
+                foreach (HtmlNode link in doc.DocumentNode.SelectNodes((".//img/@alt")))
                 {
-                    string src = link.Attributes["src"].Value;
-                    if (src.Contains("http"))
+                    string alt = link.Attributes["alt"].Value;
+                    if (alt.Contains(Text))                  // jak alt zawiera tekst
                     {
-                        using (WebClient client = new WebClient())
+                        string src = link.Attributes["src"].Value;
+                        if (src.Contains("http"))
                         {
-                            client.DownloadFile(src, fileName); // zapis obrazka do pliku
-                            return true;
+                            using (WebClient client = new WebClient())
+                            {
+                                client.DownloadFile(src, fileName); // zapis obrazka do pliku
+                                msg = "Obrazek na temat: " + Text + ".\nPobrano ze strony: " + Url + '.';
+                                form.UpdateInfoLabel("Pobrano obrazek");
+                                Logs.Info("Pobrano obrazek");
+                                return true;
+                            }
                         }
                     }
                 }
+                form.UpdateInfoLabel("Nie znaleziono obrazka z podanym tekstem");
+                Logs.Error("Nie znaleziono obrazka z podanym tekstem");
+            }
+            else
+            {
+                form.UpdateInfoLabel("Podany Url nie istnieje");
+                Logs.Error("Podany Url nie istnieje");
             }
             return false;                       // jak nie znaleziono obrazka
         }
@@ -53,7 +68,7 @@ namespace ITTT_Final
     public class ITTTConditionWeather : ITTTCondition
     {
         private WeatherObject weather;
-        public override bool CheckCondition(string html, string fileName)
+        public override bool CheckCondition(string fileName, ref string msg, Form1 form)
         {
             using (WebClient wc = new WebClient())
             {
@@ -61,7 +76,8 @@ namespace ITTT_Final
                 {
                     string json = wc.DownloadString("http://api.openweathermap.org/data/2.5/weather?q=" + Url + ",pl");
                     weather = JsonConvert.DeserializeObject<WeatherObject>(json);
-
+                    form.UpdateInfoLabel("Pobrano dane pogodowe");
+                    Logs.Info("Pobrano dane pogodowe");
                     using (WebClient wc2 = new WebClient())
                     {
                         wc2.DownloadFile("http://openweathermap.org/img/w/" + weather.Weather[0].icon + ".png", fileName);
@@ -69,12 +85,25 @@ namespace ITTT_Final
                 }
                 catch
                 {
-                    Logs.Error("Weather Server not responding.");
+                    form.UpdateInfoLabel("Serwer pogodowy nie odpowiada. Spróbuj ponownie");
+                    Logs.Error("Serwer pogodowy nie odpowiada. Spróbuj ponownie");
                     return false;
                 }
             }
-            if (weather.Main.temp > Convert.ToInt32(Text)) return true;
+            if (weather.Main.temp > Convert.ToInt32(Text))
+            {
+                var time = UnixTimeStampToDateTime(weather.dt);
+                msg = String.Format("Miasto: {0},\nTemperatura: {1:0.0} °C,\nCiśnienie: {2} hPa,\nNiebo: "
+                                + weather.Weather[0].description + ",\nOdczyt: " + time.ToLongTimeString() + '.', Url, weather.Main.temp - 273.15, weather.Main.pressure);
+                return true;
+            }
             else return false;
+        }
+        public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
+        {
+            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            return dtDateTime;
         }
         public override string ToString()
         {

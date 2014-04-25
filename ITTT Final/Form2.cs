@@ -17,10 +17,10 @@ namespace ITTT_Final
         {
             InitializeComponent();
         }
-        public void PrepareForm(string fileName, string url, string text)
+        public void PrepareForm(string fileName, string msg)
         {
             picture = new Bitmap(fileName);
-            richTextBox1.Text = "Obrazek na temat " + text + "\nObrazek ze strony " + url;
+            richTextBox1.Text = msg;
             pictureBox1.Image = (Image)picture;
         }
         private void Form2_FormClosed(object sender, FormClosedEventArgs e)

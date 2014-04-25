@@ -10,9 +10,9 @@ using HtmlAgilityPack;
 
 namespace ITTT_Final
 {
-    class Net_Functions
+    class NetFunctions
     {
-        public bool Is_Url(string url)
+        public bool IsUrl(string url)
         {
             WebRequest webRequest = WebRequest.Create(url);  
             WebResponse webResponse;

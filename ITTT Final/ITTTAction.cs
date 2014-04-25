@@ -15,16 +15,16 @@ namespace ITTT_Final
     public abstract class ITTTAction
     {
         public string Address { get; set; }
-        public abstract void ExecuteAction(string fileName, string url, string text);
+        public abstract void ExecuteAction(string fileName, string msg);
     }
     [Serializable]
     public class ITTTActionSendMail : ITTTAction
     {
-        public override void ExecuteAction(string fileName, string url, string text)
+        public override void ExecuteAction(string fileName, string msg)
         {
             MailMessage mail = new MailMessage("net.art.pwr@gmail.com", Address);
-            mail.Subject = "Obrazek na temat " + text;
-            mail.Body = "Obrazek ze strony " + url;
+            mail.Subject = "ITTTActionSendMail";
+            mail.Body = msg;
             mail.Attachments.Add(new Attachment(fileName));
             SmtpClient smtp = new SmtpClient();
             smtp.Port = 587;
@@ -46,11 +46,11 @@ namespace ITTT_Final
     [Serializable]
     public class ITTTActionShowWindow: ITTTAction
     {
-        public override void ExecuteAction(string fileName, string url, string text)
+        public override void ExecuteAction(string fileName, string msg)
         {
             Form2 form = new Form2();
 
-            form.PrepareForm(fileName, url, text);
+            form.PrepareForm(fileName, msg);
             form.ShowDialog();
         }
         public override string ToString()

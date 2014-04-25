@@ -6,9 +6,6 @@ using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
-
-
 using System.Security.Permissions;
 
 
@@ -30,7 +27,6 @@ namespace ITTT_Final
         public void UpdateInfoLabel(string nfo)
         {
             label14.Text = nfo;
-            Application.DoEvents();
         }
         public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
@@ -49,7 +45,7 @@ namespace ITTT_Final
             }
             if (tabControl1.SelectedIndex == 1)
             {
-                tmp.condition = new ITTTConditionPicture();
+                tmp.condition = new ITTTConditionWeather();
                 tmp.condition.Url = textBox5.Text;
                 tmp.condition.Text = numericUpDown1.Text;
             }
@@ -70,31 +66,23 @@ namespace ITTT_Final
         }
         private void button2_Click(object sender, EventArgs e)
         {
-            Net_Functions net = new Net_Functions();
             Task tmp = new Task();
             string fileName = "pic.jpg";
+            string msg = "";
+
             for (int i = 0; i < taskNumber; i++)
             {
                 tmp = list[i];
-                if (net.Is_Url(tmp.condition.Url))
+                if (tmp.condition.CheckCondition(fileName, ref msg, this))
                 {
-                    string html = net.GetPageHtml(tmp.condition.Url);
-                    if (tmp.condition.CheckCondition(html, fileName))
-                    {
-                        tmp.action.ExecuteAction(fileName, tmp.condition.Url, tmp.condition.Text);
-                        Logs.Info("Wykonano akcje");
-                        UpdateInfoLabel("Wykonano akcje");
-                    }
-                    else
-                    {
-                        UpdateInfoLabel("Nie znaleziono obrazka z podanym tekstem");
-                        Logs.Error("Nie znaleziono obrazka z podanym tekstem");
-                    }
+                    tmp.action.ExecuteAction(fileName, msg);
+                    UpdateInfoLabel("Wykonano akcje");
+                    Logs.Info("Wykonano akcje");
                 }
                 else
                 {
-                    UpdateInfoLabel("Podany Url nie istnieje");
-                    Logs.Error("Podany Url nie istnieje");
+                    UpdateInfoLabel("Warunek nie został spełniony");
+                    Logs.Info("Warunek nie został spełniony");
                 }
             }
         }
