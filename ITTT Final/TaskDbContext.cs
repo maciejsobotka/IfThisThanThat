@@ -13,11 +13,11 @@ namespace ITTT_Final
             : base("BaseTask")
         {
             // Użyj klasy TaskDbInitializer do zainicjalizowania bazy danych
-            Database.SetInitializer<TaskDbContext>(new Task());
+            Database.SetInitializer<TaskDbContext>(new TaskDbInitializer());
         }
 
         public DbSet<Task> Task { get; set; }
-        public DbSet<ITTTCondition> Conditions { get; set; }
-        public DbSet<ITTTAction> Actions { get; set; }
+        public DbSet<ITTTCondition> Condition { get; set; }
+        public DbSet<ITTTAction> Action { get; set; }
     }
 }
