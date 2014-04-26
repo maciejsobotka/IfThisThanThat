@@ -33,15 +33,6 @@ namespace ITTT_Final
 
             Task ta = new Task();
             
-            //ta.Id = 1;
-            //ta.condition.Url = "demotywatory.pl";
-            //ta.condition.Text = "jak";
-            //ta.action.Address = "bartekamicus@gmail.com";
-            //ta.Url = "wp.pl";
-            //ta.Text = "polityka";
-            //ta.TaskName = "test1";
-            //ta.Addres = "testowymail@gmail.com";
-            
             var task = db.Task.Include("Tasks");
             var cond = db.Conditions.Include("Conditions");
             var act = db.Actions.Include("Actions");
