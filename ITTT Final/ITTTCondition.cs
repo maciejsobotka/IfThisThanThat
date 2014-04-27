@@ -16,10 +16,11 @@ namespace ITTT_Final
     public abstract class ITTTCondition
     {
         [Key]
+        public int Id { get; set; }
         public string Url { get; set; }
         public string Text { get; set; }
 
-        public abstract bool CheckCondition(string a, ref string msg, Form1 form);
+        public abstract bool CheckCondition(ref string fileName, ref string msg, Form1 form);
 
         public override string ToString()
         {
@@ -29,9 +30,10 @@ namespace ITTT_Final
     [Serializable]
     public class ITTTConditionPicture: ITTTCondition
     {
-        public override bool CheckCondition(string fileName, ref string msg, Form1 form)
+        public override bool CheckCondition(ref string fileName, ref string msg, Form1 form)
         {
             NetFunctions net = new NetFunctions();
+            fileName = "picture.jpg";
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             if (net.IsUrl(Url))
             {
@@ -66,19 +68,18 @@ namespace ITTT_Final
             }
             return false;                       // jak nie znaleziono obrazka
         }
-        /*
         public override string ToString()
         {
             return string.Format("strona: {0}, słowo klucz: {1}, ", Url, Text);
         }
-        */
     }
     [Serializable]
     public class ITTTConditionWeather : ITTTCondition
     {
         private WeatherObject weather;
-        public override bool CheckCondition(string fileName, ref string msg, Form1 form)
+        public override bool CheckCondition(ref string fileName, ref string msg, Form1 form)
         {
+            fileName = "icon.png";
             using (WebClient wc = new WebClient())
             {
                 try
@@ -99,7 +100,8 @@ namespace ITTT_Final
                     return false;
                 }
             }
-            if (weather.Main.temp > Convert.ToInt32(Text))
+            var tempVal = Convert.ToDouble(Text) + 273.15;
+            if (weather.Main.temp > tempVal)
             {
                 var time = UnixTimeStampToDateTime(weather.dt);
                 msg = String.Format("Miasto: {0},\nTemperatura: {1:0.0} °C,\nCiśnienie: {2} hPa,\nNiebo: "
@@ -114,11 +116,9 @@ namespace ITTT_Final
             dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
             return dtDateTime;
         }
-        /*
         public override string ToString()
         {
             return string.Format("miasto: {0}, temperatura: {1}, ", Url, Text);
         }
-         */
     }
 }

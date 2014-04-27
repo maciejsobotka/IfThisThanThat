@@ -21,6 +21,8 @@ namespace ITTT_Final
         {
             picture = new Bitmap(fileName);
             richTextBox1.Text = msg;
+            if (msg.Contains("Miasto"))
+                pictureBox1.SizeMode = PictureBoxSizeMode.Normal;
             pictureBox1.Image = (Image)picture;
         }
         private void Form2_FormClosed(object sender, FormClosedEventArgs e)

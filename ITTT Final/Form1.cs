@@ -18,40 +18,46 @@ namespace ITTT_Final
         private List<Task> list;
         private int taskNumber;
         private DateTime time;
+        ITTTDbContext db;
 
         public Form1()
         {         
             InitializeComponent();
             s = new Serialization(this);
             list = new List<Task>();
+            db = new ITTTDbContext();
             taskNumber = 0;
-
+            List<ITTTCondition> condList = new List<ITTTCondition>();
+            List<ITTTAction> actList = new List<ITTTAction>();
             var task = db.Task;
             var cond = db.Condition;
             var act = db.Action;
-            /*
-            foreach (var t in task)
-            {
-                //list.Add(t);
-                
-                listBox1.Items.Add(t.ToString());
-                
-            }
-            */
-            foreach (var c in cond)
-            {
-                listBox1.Items.Add(c.ToString());
+
+            if(task!=null){
+                foreach (var c in cond)
+                {
+                    condList.Add(c);
+                    taskNumber++;
+                }
+                taskNumber=0;
                 foreach (var a in act)
                 {
-                    listBox1.Items.Add(a.ToString());
+                    actList.Add(a);
+                    taskNumber++;    
+                }
+                taskNumber=0;
+                foreach (var t in task)
+                {
+                    t.condition = condList[taskNumber];
+                    t.action = actList[taskNumber];
+                    list.Add(t);
+                    listBox1.Items.Add(t.ToString());
+                    taskNumber++;
                 }
             }
-
             UpdateInfoBox("Start programu");
             Logs.Info("Start programu");
         }
-
-        TaskDbContext db = new TaskDbContext();
 
         public void UpdateInfoBox(string nfo)
         {
@@ -67,53 +73,52 @@ namespace ITTT_Final
         private void button1_Click(object sender, EventArgs e)
         {
             Task tmp = new Task();
+            taskNumber++;
             if (tabControl1.SelectedIndex == 0)
             {
                 tmp.condition = new ITTTConditionPicture();
                 tmp.condition.Url = "http://www." + textBox1.Text + "/";
                 tmp.condition.Text = textBox2.Text;
-                db.Condition.Add(tmp.condition);
-                db.SaveChanges();
+                tmp.condition.Id = taskNumber;
             }
             if (tabControl1.SelectedIndex == 1)
             {
                 tmp.condition = new ITTTConditionWeather();
                 tmp.condition.Url = textBox5.Text;
                 tmp.condition.Text = numericUpDown1.Text;
-                db.Condition.Add(tmp.condition);
-                db.SaveChanges();
+                tmp.condition.Id = taskNumber;
             }
             if (tabControl2.SelectedIndex == 0)
             {
                 tmp.action = new ITTTActionSendMail();
                 tmp.action.Address = textBox3.Text;
-                db.Action.Add(tmp.action);
-                db.SaveChanges();
+                tmp.action.Id = taskNumber;
             }
             if (tabControl2.SelectedIndex == 1)
             {
                 tmp.action = new ITTTActionShowWindow();
                 tmp.action.Address = "";
-                db.Action.Add(tmp.action);
-                db.SaveChanges();
+                tmp.action.Id = taskNumber;
             }
             tmp.TaskName = textBox4.Text;
+            tmp.Id = taskNumber;
             listBox1.Items.Add(tmp.ToString());
             list.Add(tmp);
+            db.Condition.Add(tmp.condition);
+            db.Action.Add(tmp.action);
             db.Task.Add(tmp);
             db.SaveChanges();
-            taskNumber++;
         }
         private void button2_Click(object sender, EventArgs e)
         {
             Task tmp = new Task();
-            string fileName = "pic.jpg";
+            string fileName = "";
             string msg = "";
 
             for (int i = 0; i < taskNumber; i++)
             {
                 tmp = list[i];
-                if (tmp.condition.CheckCondition(fileName, ref msg, this))
+                if (tmp.condition.CheckCondition(ref fileName, ref msg, this))
                 {
                     UpdateInfoBox("Warunek został spełniony");
                     Logs.Info("Warunek został spełniony");
@@ -133,28 +138,7 @@ namespace ITTT_Final
             listBox1.Items.Clear();
             list.Clear();
             taskNumber = 0;
-            
-            
-            var task = db.Task;//.Include("Tasks");
-            var cond = db.Condition;//.Include("Conditions");
-            var act = db.Action;//.Include("Actions");
-
-            foreach (var t in task)
-            {
-                db.Task.Remove(t);
-            }
-            
-            foreach (var c in cond)
-            {
-                db.Condition.Remove(c);
-            }
-
-            foreach (var a in act)
-            {
-                db.Action.Remove(a);
-            }
-
-            db.SaveChanges();
+            db.ClearDb();     
             
             UpdateInfoBox("Wyczyszczono listę zadań");
             Logs.Info("Wyczyszczono listę zadań");
@@ -165,11 +149,19 @@ namespace ITTT_Final
         }
         private void button5_Click(object sender, EventArgs e)
         {
+            listBox1.Items.Clear();
             list.Clear();
+            db.ClearDb(); 
             list = s.DeSerialize();
             taskNumber = list.Count;
             for (int i = 0; i < taskNumber; i++)
+            {
                 listBox1.Items.Add(list[i].ToString());
+                db.Condition.Add(list[i].condition);
+                db.Action.Add(list[i].action);
+                db.Task.Add(list[i]);
+                db.SaveChanges();
+            }
          }
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {

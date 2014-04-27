@@ -78,8 +78,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization.cs" />
     <Compile Include="Task.cs" />
-    <Compile Include="TaskDbContext.cs" />
-    <Compile Include="TaskDbInitializer.cs" />
+    <Compile Include="ITTTDbContext.cs" />
+    <Compile Include="ITTTDbInitializer.cs" />
     <Compile Include="WeatherObject.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

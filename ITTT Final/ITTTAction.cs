@@ -16,6 +16,7 @@ namespace ITTT_Final
     public abstract class ITTTAction
     {
         [Key]
+        public int Id {get; set; }
         public string Address { get; set; }
         
         public abstract void ExecuteAction(string fileName, string msg);
