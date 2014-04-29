@@ -20,6 +20,9 @@ namespace ITTT_Final
         private DateTime time;
         ITTTDbContext db;
 
+        //delegate void UpdateInfoBoxCallback(string nfo);
+        //private Thread TaskThread = null;
+
         public Form1()
         {         
             InitializeComponent();
@@ -61,14 +64,16 @@ namespace ITTT_Final
 
         public void UpdateInfoBox(string nfo)
         {
-            time = DateTime.Now;
-            listBox2.Items.Add('[' + time.ToLongTimeString() + ' ' + time.ToShortDateString() + "] " + nfo);
-        }
-        public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
-        {
-            System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
-            return dtDateTime;
+            //if (listBox2.InvokeRequired)
+            //{
+            //    UpdateInfoBoxCallback d = new UpdateInfoBoxCallback(UpdateInfoBox);
+            //    this.Invoke(d, new object[] { nfo });
+            //}
+            //else
+            //{
+                time = DateTime.Now;
+                listBox2.Items.Add('[' + time.ToLongTimeString() + ' ' + time.ToShortDateString() + "] " + nfo);
+            //}
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -112,25 +117,12 @@ namespace ITTT_Final
         private void button2_Click(object sender, EventArgs e)
         {
             Task tmp = new Task();
-            string fileName = "";
-            string msg = "";
 
             for (int i = 0; i < taskNumber; i++)
             {
                 tmp = list[i];
-                if (tmp.condition.CheckCondition(ref fileName, ref msg, this))
-                {
-                    UpdateInfoBox("Warunek został spełniony");
-                    Logs.Info("Warunek został spełniony");
-                    tmp.action.ExecuteAction(fileName, msg);
-                    UpdateInfoBox("Wykonano akcje");
-                    Logs.Info("Wykonano akcje");
-                }
-                else
-                {
-                    UpdateInfoBox("Warunek nie został spełniony");
-                    Logs.Info("Warunek nie został spełniony");
-                }
+                //TaskThread = new Thread(new ThreadStart (tmp.CheckTask));
+                tmp.CheckTask(this);
             }
         }
         private void button3_Click(object sender, EventArgs e)
