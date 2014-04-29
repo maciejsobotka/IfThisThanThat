@@ -10,7 +10,7 @@ namespace ITTT_Final
     public class ITTTDbContext : DbContext
     {
         public ITTTDbContext()
-            : base("ITTTDataBase")
+            : base("ITTTDB")
         {
             // Użyj klasy TaskDbInitializer do zainicjalizowania bazy danych
             Database.SetInitializer<ITTTDbContext>(new ITTTDbInitializer());

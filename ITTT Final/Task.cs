@@ -14,8 +14,9 @@ namespace ITTT_Final
 
         public ITTTCondition condition;
         public ITTTAction action;
+        public Form1 form;
 
-        public void CheckTask(Form1 form)
+        public void CheckTask()
         {
             string fileName = "";
             string msg = "";

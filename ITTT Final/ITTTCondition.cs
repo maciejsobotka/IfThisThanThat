@@ -8,6 +8,7 @@ using HtmlAgilityPack;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using System.Threading;
 
 namespace ITTT_Final
 {
@@ -33,7 +34,7 @@ namespace ITTT_Final
         public override bool CheckCondition(ref string fileName, ref string msg, Form1 form)
         {
             NetFunctions net = new NetFunctions();
-            fileName = "picture.jpg";
+            fileName = Thread.CurrentThread.Name + "picture.jpg";
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             if (net.IsUrl(Url))
             {
@@ -79,7 +80,7 @@ namespace ITTT_Final
         private WeatherObject weather;
         public override bool CheckCondition(ref string fileName, ref string msg, Form1 form)
         {
-            fileName = "icon.png";
+            fileName = Thread.CurrentThread.Name + "icon.png";
             using (WebClient wc = new WebClient())
             {
                 try

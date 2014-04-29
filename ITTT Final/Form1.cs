@@ -20,8 +20,8 @@ namespace ITTT_Final
         private DateTime time;
         ITTTDbContext db;
 
-        //delegate void UpdateInfoBoxCallback(string nfo);
-        //private Thread TaskThread = null;
+        delegate void UpdateInfoBoxCallback(string nfo);
+        private Thread TaskThread = null;
 
         public Form1()
         {         
@@ -64,16 +64,16 @@ namespace ITTT_Final
 
         public void UpdateInfoBox(string nfo)
         {
-            //if (listBox2.InvokeRequired)
-            //{
-            //    UpdateInfoBoxCallback d = new UpdateInfoBoxCallback(UpdateInfoBox);
-            //    this.Invoke(d, new object[] { nfo });
-            //}
-            //else
-            //{
+            if (listBox2.InvokeRequired)
+            {
+                UpdateInfoBoxCallback d = new UpdateInfoBoxCallback(UpdateInfoBox);
+                this.Invoke(d, new object[] { nfo });
+            }
+            else
+            {
                 time = DateTime.Now;
                 listBox2.Items.Add('[' + time.ToLongTimeString() + ' ' + time.ToShortDateString() + "] " + nfo);
-            //}
+            }
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -121,8 +121,11 @@ namespace ITTT_Final
             for (int i = 0; i < taskNumber; i++)
             {
                 tmp = list[i];
-                //TaskThread = new Thread(new ThreadStart (tmp.CheckTask));
-                tmp.CheckTask(this);
+                tmp.form = this;
+                TaskThread = new Thread(new ThreadStart(tmp.CheckTask));
+                TaskThread.Name = "Thread" + i.ToString();
+                TaskThread.Start();
+                //tmp.CheckTask(this);
             }
         }
         private void button3_Click(object sender, EventArgs e)
